@@ -1,25 +1,28 @@
 .data
-	temperatura: .asciiz "Digite a temperatura em Fahrenheit:"
-	convertido: .asciiz "A temperatura em Celsius é "
+	qualTemperaturaEmF: .asciiz "Digite a temperatura em Celsius:"
+	convertido: .asciiz "A temperatura em Fahrenheit é "
+	nove: .float 9
+	trintaEdois: .float 32
+	cinco: .float 5
 	# F = 32 + ((9*C) / 5)
 	# Fn = FN-1 + Fn-2
+	
 .text
-	la $a0, temperatura
+	# Solicita a temperatura
+	la $a0, qualTemperaturaEmF
 	li $v0, 4
 	syscall
 
-	li $v0, 5
+	l.s $f3, nove
+	l.s $f4, trintaEdois
+	l.s $f5, cinco
+	li $v0, 6
 	syscall
 	
-	addi $s1, $s1, 9
-	addi $s2, $s2, 5
-	addi $s3, $s3, 32
+	mul.s $f1, $f0, $f3 
+	div.s $f2, $f1, $f5
+	add.s $f1, $f2, $f4
+	mov.s $f12, $f1
 	
-	move $s0, $v0
-	mul $s0, $s0, $s1 
-	div $s0, $s2, $s0
-	addi $s0, $s0, $s3
-	move $a0, $s0
-	
-	li $v0, 1
+	li $v0, 2
 	syscall
