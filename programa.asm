@@ -1,14 +1,24 @@
 .data
-	escolha: .asciiz "1 - Fahrenheit -> Celsius \n 2 - Fibonnacci \n 3 - Enésimo par \n 4 - Sair \n"
+	# Menu
+	escolha: .asciiz "1 - Fahrenheit -> Celsius \n2 - Fibonnacci \n3 - Enésimo par \n4 - Sair \n"
+	
+	# Fahrenheit -> Celcius
 	qualTemperaturaEmF: .asciiz "Digite a temperatura em Fahrenheit: "
 	convertido: .asciiz "A temperatura em Celsius é "
 	nove: .float 9
 	trintaEdois: .float 32
 	cinco: .float 5
 	saiu: .asciiz "Você saiu do programa."
+	
+	# Others
 	newline: .asciiz "\n"
 	
+	# Enésimo Par
+	qualpar: .asciiz "Qual enésimo par você quer saber?"
+	opar: .asciiz "O seu enésimo número par é o: "
+	
 .text
+
 start:
 	# --------- MENU ----------
 	la $a0, escolha
@@ -32,6 +42,7 @@ start:
 	la $a0, newline
 	li $v0, 4
 	syscall
+	
 ftoc:
 	# --------- Fahrenheit -> Celsius ----------
 	# Operação - C = (F-32)/1,8
@@ -60,7 +71,14 @@ ftoc:
 	li $v0, 2
 	syscall
 	
+	#Pula linha
+	la $a0, newline
+	li $v0, 4
+	syscall
+	
+	# Volta para o menu
 	j start
+	
 fibonnaci:
 	# --------- Fibonnaci ----------
 	# Fn = FN-1 + Fn-2
@@ -69,17 +87,53 @@ fibonnaci:
 	li $v0, 4
 	syscall
 	
-	# Volta para o menu
-	j start
-enesimo:
-	# --------- enesimo ----------
 	
-	la $a0, saiu
+	#Pula linha
+	la $a0, newline
 	li $v0, 4
 	syscall
 	
 	# Volta para o menu
 	j start
+	
+enesimo:
+	# --------- enesimo ----------
+	
+	# inicio
+	la $a0, qualpar
+	li $v0, 4
+	syscall
+	
+	#Pula linha
+	la $a0, newline
+	li $v0, 4
+	syscall
+
+	# Pede um inteiro para o usuário
+	li $v0, 5
+	syscall
+
+	# Faz o cálculo (enésimo= 2N)
+	mul $a2, $v0, 2
+	
+	# Printa o texto 
+	la $a0, opar
+	li $v0, 4
+	syscall	
+	
+	# Printa o enésimo número
+	move $a0, $a2	
+	li $v0, 1 
+	syscall
+	
+	#Pula linha
+	la $a0, newline
+	li $v0, 4
+	syscall
+	
+	# Volta para o menu
+	j start
+	
 sair:
 	la $a0, saiu
 	li $v0, 4
