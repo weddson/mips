@@ -14,12 +14,24 @@
 	newline: .asciiz "\n"
 	
 	# Enésimo Par
-	qualpar: .asciiz "Qual enésimo par você quer saber?"
-	opar: .asciiz "O seu enésimo número par é o: "
+	termopar: .asciiz "Digite o valor de n para calcular o enésimo termo par: "
+	resultadotermopar: .asciiz "O enésimo termo par é: "
+	entrada_invalida_msg: .asciiz "Entrada inválida. O número deve ser maior que zero."
 	
+	# Fibonacci
+	entradaFibonacci:     .asciiz "Digite o valor de N: "
+	resultadoFibonacci:     .asciiz "O enésimo termo da sequência de Fibonacci é: "
 .text
 
-start:
+menu:
+	# Reseta variáveis
+	
+	move $t0, $zero     # Move o valor zero para $t1
+	move $t1, $zero     # Move o valor zero para $t1
+	move $t2, $zero     # Move o valor zero para $t1
+	move $t3, $zero     # Move o valor zero para $t1
+	move $t4, $zero     # Move o valor zero para $t1
+		
 	# --------- MENU ----------
 	la $a0, escolha
 	li $v0, 4
@@ -77,62 +89,103 @@ ftoc:
 	syscall
 	
 	# Volta para o menu
-	j start
+	j menu
 	
 fibonnaci:
-	# --------- Fibonnaci ----------
-	# Fn = FN-1 + Fn-2
-	
-	la $a0, saiu
-	li $v0, 4
-	syscall
-	
-	
-	#Pula linha
-	la $a0, newline
-	li $v0, 4
-	syscall
-	
-	# Volta para o menu
-	j start
-	
-enesimo:
-	# --------- enesimo ----------
-	
-	# inicio
-	la $a0, qualpar
-	li $v0, 4
-	syscall
-	
-	#Pula linha
-	la $a0, newline
+	# Imprimir o prompt para o usuário
+	la $a0, entradaFibonacci
 	li $v0, 4
 	syscall
 
-	# Pede um inteiro para o usuário
+	# Ler o valor de N do usuário
 	li $v0, 5
 	syscall
+	
+	move $t0, $v0   # $t0 contém N
 
-	# Faz o cálculo (enésimo= 2N)
-	mul $a2, $v0, 2
+	# Inicializar os primeiros termos da sequência de Fibonacci
+	li $t1, 1    # Primeiro termo (F0)
+	li $t2, 1    # Segundo termo (F1)
+	li $t3, 2    # Inicializador para o loop (começa em 2)
 	
-	# Printa o texto 
-	la $a0, opar
+	fibonacci_loop:
+		# Verificar se o valor de N é 0 ou 1
+		beq $t0, $zero, saidaFibonacci
+		beq $t0, $t3, saidaFibonacci
+		beq $t0, 1, saidaFibonacci
+
+		# Calcular o próximo termo da sequência
+		add $t4, $t1, $t2  # $t4 = F(n-1) + F(n-2)
+		move $t1, $t2      # $t1 = F(n-1)
+		move $t2, $t4      # $t2 = F(n-2)
+
+		# Incrementar o contador e verificar o final do loop
+		addi $t3, $t3, 1
+		j fibonacci_loop
+		
+	saidaFibonacci:
+	# Imprimir o resultado
 	li $v0, 4
-	syscall	
-	
-	# Printa o enésimo número
-	move $a0, $a2	
-	li $v0, 1 
+	la $a0, resultadoFibonacci
 	syscall
-	
+
+	# Imprimir o enésimo termo da sequência
+	move $a0, $t2
+	li $v0, 1
+	syscall
+
 	#Pula linha
 	la $a0, newline
 	li $v0, 4
 	syscall
 	
-	# Volta para o menu
-	j start
+	j menu
+	
+enesimo:
+	# Imprime a entrada sobre o enésimo termo par
+	li $v0, 4           # Carrega o código 4 em $v0 para imprimir uma string
+	la $a0, termopar    # Carrega o endereço de termopar em $a0
+	syscall             # Chama o sistema para imprimir a mensagem
+
+	# Ler o número
+	li $v0, 5           # Carrega o código 5 em $v0 para ler um inteiro
+	syscall             # Realiza a chamada do sistema para ler o número
+
+	# Validação de entrada
+	bltz $v0, entrada_invalida # Se $v0 for menor que zero, vá para entrada_invalida
+
+	# Reinicia a variável $t1 para 0
+	move $t1, $zero     # Move o valor zero para $t1
+
+	# Cálculo do enésimo termo par
+	move $t0, $v0       # Move o valor lido para $t0
+	addi $t1, $t1, 2    # Adiciona 2 em $t1
+	mul $t2, $t1, $t0   # Multiplica o valor de $t1 pelo valor de $t0 e armazena em $t2
+
+	# Imprime mensagem sobre qual é o enésimo termo par
+	li $v0, 4           # Carrega o código 4 em $v0 para imprimir uma string
+	la $a0, resultadotermopar  # Carrega o endereço de resultadotermopar em $a0
+	syscall             # Chama o sistema para imprimir a mensagem
+
+	# Imprime qual é o enésimo termo par
+	li $v0, 1           # Carrega o código 1 em $v0 para imprimir um inteiro
+	move $a0, $t2       # Move o valor armazenado em $t2 para $a0
+	syscall             # Chama o sistema para imprimir o valor
+	
+	#Pula linha
+	la $a0, newline
+	li $v0, 4
+	syscall
+
+	j menu        # Pula para o fim do programa
+
+entrada_invalida:
+
+	# Tratar entrada inválida
+	li $v0, 4           # Carrega o código 4 em $v0 para imprimir uma string
+	la $a0, entrada_invalida_msg # Carrega o endereço de entrada_invalida_msg em $a0
+	syscall             # Chama o sistema para imprimir a mensagem
+	j menu        # Pula para o fim do programa
 	
 sair:
 	la $a0, saiu
