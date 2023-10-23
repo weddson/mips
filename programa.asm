@@ -101,6 +101,9 @@ fibonnaci:
 	li $v0, 5
 	syscall
 	
+	# Validação de entrada
+	bltz $v0, entrada_invalida # Se $v0 for menor que zero, vá para entrada_invalida
+	
 	move $t0, $v0   # $t0 contém N
 
 	# Inicializar os primeiros termos da sequência de Fibonacci
@@ -110,7 +113,7 @@ fibonnaci:
 	
 	fibonacci_loop:
 		# Verificar se o valor de N é 0 ou 1
-		beq $t0, $zero, saidaFibonacci
+		beq $t0, $zero, entrada_invalida
 		beq $t0, $t3, saidaFibonacci
 		beq $t0, 1, saidaFibonacci
 
@@ -185,6 +188,12 @@ entrada_invalida:
 	li $v0, 4           # Carrega o código 4 em $v0 para imprimir uma string
 	la $a0, entrada_invalida_msg # Carrega o endereço de entrada_invalida_msg em $a0
 	syscall             # Chama o sistema para imprimir a mensagem
+	
+	#Pula linha
+	la $a0, newline
+	li $v0, 4
+	syscall
+	
 	j menu        # Pula para o fim do programa
 	
 sair:
