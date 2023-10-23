@@ -1,4 +1,5 @@
 .data
+	# Integrantes do Grupo: Wedson Rocha dos Santos, Rosilene da Silva Santos e Ricardo José Tenório Cabral Torres
 	# Menu
 	escolha: .asciiz "1 - Fahrenheit -> Celsius \n2 - Fibonnacci \n3 - Enésimo par \n4 - Sair \n"
 	
